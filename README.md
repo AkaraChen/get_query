@@ -1,5 +1,7 @@
 # Get Query
 
+[简体中文](./README.CN.md)
+
 The missing async state management wrapper for GetX.
 
 ## Motivation
