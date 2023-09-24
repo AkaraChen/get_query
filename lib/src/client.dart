@@ -1,0 +1,1 @@
+typedef QueryKey = List<String>;
