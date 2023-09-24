@@ -34,6 +34,9 @@ class QueryController<FetchContext, RequestBody, ResponseData>
   }
 
   Future<void> fetch() async {
+    if (isFetching) {
+      completer.operation.cancel();
+    }
     try {
       final middlewareChain = MiddlewareChain<ResponseData>([
         options.retry.createRetryMiddleware<ResponseData>(),

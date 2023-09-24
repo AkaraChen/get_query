@@ -1,5 +1,3 @@
-// ignore_for_file: invalid_use_of_protected_member, empty_catches, argument_type_not_assignable_to_error_handler
-
 import 'package:get_query/get_query.dart';
 
 class SimpleController extends QueryController<String, void, String> {
