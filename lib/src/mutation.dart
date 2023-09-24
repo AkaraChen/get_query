@@ -1,49 +1,59 @@
-// import 'package:get_query/get_query.dart';
+import 'package:get_query/get_query.dart';
+import 'package:get_query/src/middlewares/middleware.dart';
+import 'package:get_query/src/middlewares/retry.dart';
 
-// class MutationControllerOptions extends QueryControllerOptions {}
+class MutationControllerOptions extends QueryControllerOptions {
+  const MutationControllerOptions({
+    retry = const RetryConfig(maxAttempts: 0),
+  }) : super(retry: retry);
+}
 
-// // Use for doing some async task
-// class MutationController<MutationContext, RequestBody, ResponseData>
-//     extends QueryController<MutationContext, RequestBody, ResponseData> {
-//   final MutationControllerOptions? mutationOptions;
-//   MutationController({
-//     required super.context,
-//     this.mutationOptions,
-//   });
+// Use for doing some async task
+class MutationController<MutationContext, RequestBody, ResponseData>
+    extends QueryController<MutationContext, RequestBody, ResponseData> {
+  final MutationControllerOptions mutationOptions;
 
-//   get isMutating => isFetching;
+  MutationController({
+    required super.context,
+    this.mutationOptions = const MutationControllerOptions(),
+  });
 
-//   @override
-//   Future<void> fetch() async {
-//     throw UnsupportedError('Use mutate() instead');
-//   }
+  bool get isMutating => isFetching;
 
-//   Future<void> mutate(RequestBody body) async {
-//     try {
-//       var futureWithRetryOrNot = options?.retry != null
-//           ? options!.retry!
-//               .createRetryMiddleware(() => callMutate(context, body))
-//           : callMutate(context, body);
-//       future.value = futureWithRetryOrNot;
-//       final response = await futureWithRetryOrNot;
-//       await onMutateSuccess(response, body);
-//     } catch (err) {
-//       await onMutateError(err);
-//       error.value = err as Error;
-//       // rethrow;
-//     } finally {
-//       await onMutateComplete();
-//       isMutating.value = false;
-//     }
-//   }
+  @override
+  Future<void> fetch() async {
+    throw UnsupportedError('Use mutate() instead');
+  }
 
-//   // must be implemented
-//   Future<ResponseData> callMutate(
-//       MutationContext context, RequestBody body) async {
-//     throw UnimplementedError();
-//   }
+  Future<void> mutate(RequestBody body) async {
+    try {
+      final middlewareChain = MiddlewareChain<ResponseData>([
+        options.retry.createRetryMiddleware<ResponseData>(),
+      ]);
 
-//   Future<void> onMutateSuccess(ResponseData data, RequestBody body) async {}
-//   Future<void> onMutateError(dynamic err) async {}
-//   Future<void> onMutateComplete() async {}
-// }
+      var futureWithMiddleware = middlewareChain.applyMiddleware(
+        () => callFetch(context),
+      );
+
+      future.value = futureWithMiddleware;
+      final response = await futureWithMiddleware;
+      await onMutateSuccess(response, body);
+    } catch (err) {
+      await onMutateError(err);
+      error.value = err as Error;
+      // rethrow;
+    } finally {
+      await onMutateComplete();
+    }
+  }
+
+  // must be implemented
+  Future<ResponseData> callMutate(
+      MutationContext context, RequestBody body) async {
+    throw UnimplementedError();
+  }
+
+  Future<void> onMutateSuccess(ResponseData data, RequestBody body) async {}
+  Future<void> onMutateError(dynamic err) async {}
+  Future<void> onMutateComplete() async {}
+}

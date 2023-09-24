@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_query/src/middlewares/cancelable.dart';
 import 'package:get_query/src/middlewares/middleware.dart';
+import 'package:get_query/src/middlewares/retry.dart';
 import 'package:get_query/src/options.dart';
 
 class QueryController<FetchContext, RequestBody, ResponseData>
@@ -11,8 +12,13 @@ class QueryController<FetchContext, RequestBody, ResponseData>
 
   QueryController({
     required this.context,
-    this.options = const QueryControllerOptions(),
+    this.options = const QueryControllerOptions(
+        retry: RetryConfig(
+      maxAttempts: 3,
+    )),
   });
+
+  bool get isFetching => future.value != null;
 
   @protected
   final future = Rxn<Future<ResponseData>>();
@@ -49,8 +55,8 @@ class QueryController<FetchContext, RequestBody, ResponseData>
     }
   }
 
-  bool get isFetching => future.value != null;
-
+  // Rx reactivity is shallow, so we can't use Rxn here
+  // so we need to update manually
   ResponseData? _data;
   ResponseData get data => _data!;
   setData(Function(ResponseData? data) updater) {

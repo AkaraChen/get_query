@@ -26,7 +26,7 @@ class RetryConfig {
 }
 
 class RetryMiddleware<T> extends Middleware<T> {
-  final int maxAttempts;
+  final int? maxAttempts;
   final Duration Function(int attempt)? delayFactor;
   final FutureOr<bool> Function(Exception)? retryIf;
   final FutureOr<void> Function(Exception)? onRetry;
@@ -36,7 +36,7 @@ class RetryMiddleware<T> extends Middleware<T> {
   }
 
   RetryMiddleware({
-    this.maxAttempts = 3,
+    this.maxAttempts,
     this.delayFactor = _defaultDelayFactor,
     this.retryIf,
     this.onRetry,
@@ -56,6 +56,7 @@ class RetryMiddleware<T> extends Middleware<T> {
         if (retryIf != null && !(await retryIf!(e))) {
           rethrow;
         }
+        final maxAttempts = this.maxAttempts ?? 3;
         if (++attempt >= maxAttempts) {
           rethrow;
         }

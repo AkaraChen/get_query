@@ -25,6 +25,15 @@ class ErrorController extends QueryController<String, void, String> {
   }
 }
 
+class ErrorMutation extends MutationController<String, void, String> {
+  ErrorMutation({super.context = '', super.mutationOptions});
+
+  @override
+  Future<String> callMutate(String context, void body) async {
+    throw Exception('error');
+  }
+}
+
 void main() {
   test('should be able to fetch data', () async {
     final controller = SimpleController();
@@ -55,6 +64,21 @@ void main() {
     try {
       await controller.fetch();
     } catch (e) {}
-    expect(count, isNot(0));
+    expect(count, 3);
+  });
+
+  test('should not retry by default in mutation', () {
+    var count = 0;
+    final controller = ErrorMutation(mutationOptions: MutationControllerOptions(
+      retry: RetryConfig(
+        onRetry: (e) async {
+          count++;
+        },
+      ),
+    ));
+    try {
+      controller.mutate(null);
+    } catch (e) {}
+    expect(count, 0);
   });
 }
