@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:get_query/src/middlewares/middleware.dart';
 
-class RetryMiddleware extends Middleware {
+class RetryMiddleware<T> extends Middleware<T> {
   final int maxAttempts;
   final Duration Function(int attempt)? delayFactor;
   final FutureOr<bool> Function(Exception)? retryIf;
@@ -20,7 +20,8 @@ class RetryMiddleware extends Middleware {
   });
 
   @override
-  Future process(Future Function() action, MiddlewareChain chain) async {
+  Future<T> process(
+      Future<T> Function() action, MiddlewareChain<T> chain) async {
     int attempt = 0;
     while (true) {
       try {

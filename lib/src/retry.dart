@@ -15,7 +15,7 @@ class RetryConfig {
     this.onRetry,
   });
 
-  RetryMiddleware createRetryMiddleware() {
+  RetryMiddleware<T> createRetryMiddleware<T>() {
     return RetryMiddleware(
       delayFactor: delayFactor,
       maxAttempts: maxAttempts,

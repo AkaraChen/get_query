@@ -35,10 +35,13 @@ class QueryController<FetchContext, RequestBody, ResponseData>
   Future<void> fetch() async {
     try {
       final middlewareChain = MiddlewareChain<ResponseData>([
-        options.retry.createRetryMiddleware(),
-        // CancelableMiddleware(),
+        options.retry.createRetryMiddleware<ResponseData>(),
+        CancelableMiddleware(),
       ]);
-      var futureWithMiddleware = middlewareChain.next(() => callFetch(context));
+
+      var futureWithMiddleware = middlewareChain.applyMiddleware(
+        () => callFetch(context),
+      );
 
       future.value = futureWithMiddleware;
 

@@ -1,15 +1,15 @@
 import 'package:async/async.dart';
 import 'package:get_query/src/middlewares/middleware.dart';
 
-class CancelableMiddleware extends Middleware {
+class CancelableMiddleware<T> extends Middleware<T> {
   @override
-  Future process(Future Function() action, MiddlewareChain chain) {
-    final completer = CancelableCompleter();
+  Future<T> process(Future<T> Function() action, MiddlewareChain<T> chain) {
+    final completer = CancelableCompleter<T>();
     action().then((value) {
       completer.complete(value);
     }).catchError((error, stackTrace) {
       completer.completeError(error, stackTrace);
     });
-    return completer.operation.valueOrCancellation();
+    return completer.operation.value;
   }
 }
