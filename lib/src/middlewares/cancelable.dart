@@ -13,6 +13,6 @@ class CancelableMiddleware<T> extends Middleware<T> {
     }).catchError((error, stackTrace) {
       completer.completeError(error, stackTrace);
     });
-    return completer.operation.value;
+    return chain.next(() => completer.operation.value);
   }
 }

@@ -44,7 +44,9 @@ class RetryMiddleware<T> extends Middleware<T> {
 
   @override
   Future<T> process(
-      Future<T> Function() action, MiddlewareChain<T> chain) async {
+    Future<T> Function() action,
+    MiddlewareChain<T> chain,
+  ) async {
     int attempt = 0;
     while (true) {
       try {

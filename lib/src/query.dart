@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_query/src/middlewares/cancelable.dart';
 import 'package:get_query/src/middlewares/middleware.dart';
+import 'package:get_query/src/middlewares/query_client.dart';
 import 'package:get_query/src/middlewares/retry.dart';
 import 'package:get_query/src/options.dart';
 
@@ -37,6 +38,7 @@ class QueryController<FetchContext, RequestBody, ResponseData>
       final middlewareChain = MiddlewareChain<ResponseData>([
         options.retry.createRetryMiddleware<ResponseData>(),
         CancelableMiddleware(completer: completer),
+        QueryClientMiddleware(key: ['1'], triggerUpdate: fetch)
       ]);
 
       var futureWithMiddleware = middlewareChain.applyMiddleware(

@@ -8,3 +8,4 @@ export 'src/options.dart';
 export 'src/middlewares/middleware.dart';
 export 'src/middlewares/retry.dart';
 export 'src/middlewares/cancelable.dart';
+export 'src/middlewares/query_client.dart';
