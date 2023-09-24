@@ -1,6 +1,4 @@
 import 'package:get_query/get_query.dart';
-import 'package:get_query/src/middlewares/middleware.dart';
-import 'package:get_query/src/middlewares/retry.dart';
 
 class MutationControllerOptions extends QueryControllerOptions {
   const MutationControllerOptions({
