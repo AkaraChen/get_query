@@ -1,31 +1,24 @@
-import 'package:retry/retry.dart';
+import 'dart:async';
+
+import 'package:get_query/src/middlewares/retry.dart';
 
 class RetryConfig {
-  final Duration delayFactor;
-  final double randomizationFactor;
-  final Duration maxDelay;
   final int maxAttempts;
-  final Future<bool> Function(Exception)? retryIf;
-  final Future<dynamic> Function(Exception)? onRetry;
+  final Duration Function(int attempt)? delayFactor;
+  final FutureOr<bool> Function(Exception)? retryIf;
+  final FutureOr<void> Function(Exception)? onRetry;
 
   const RetryConfig({
-    this.delayFactor = const Duration(milliseconds: 200),
-    this.randomizationFactor = 0.25,
-    this.maxDelay = const Duration(seconds: 30),
-    this.maxAttempts = 8,
+    this.delayFactor,
+    this.maxAttempts = 3,
     this.retryIf,
     this.onRetry,
   });
 
-  Future<T> createRetry<T>(Future<T> Function() fn) async {
-    final options = RetryOptions(
+  RetryMiddleware createRetryMiddleware() {
+    return RetryMiddleware(
       delayFactor: delayFactor,
-      randomizationFactor: randomizationFactor,
-      maxDelay: maxDelay,
       maxAttempts: maxAttempts,
-    );
-    return options.retry(
-      fn,
       retryIf: retryIf,
       onRetry: onRetry,
     );

@@ -1,19 +1,21 @@
 import 'package:get/get.dart';
 import 'package:get_query/get_query.dart';
 import 'package:flutter/foundation.dart';
+import 'package:get_query/src/middlewares/cancelable.dart';
+import 'package:get_query/src/middlewares/middleware.dart';
 
 class QueryControllerOptions {
-  final RetryConfig? retry;
+  final RetryConfig retry;
 
   const QueryControllerOptions({
-    this.retry,
+    this.retry = const RetryConfig(maxAttempts: 0),
   });
 }
 
 class QueryController<FetchContext, RequestBody, ResponseData>
     extends GetxController {
   final FetchContext context;
-  final QueryControllerOptions? options;
+  final QueryControllerOptions options;
 
   QueryController({
     required this.context,
@@ -32,15 +34,15 @@ class QueryController<FetchContext, RequestBody, ResponseData>
 
   Future<void> fetch() async {
     try {
-      var futureWithRetryOrNot = options?.retry != null
-          ? options!.retry!.createRetry(() {
-              return callFetch(context);
-            })
-          : callFetch(context);
+      final middlewareChain = MiddlewareChain<ResponseData>([
+        options.retry.createRetryMiddleware(),
+        // CancelableMiddleware(),
+      ]);
+      var futureWithMiddleware = middlewareChain.next(() => callFetch(context));
 
-      future.value = futureWithRetryOrNot;
+      future.value = futureWithMiddleware;
 
-      final response = await futureWithRetryOrNot;
+      final response = await futureWithMiddleware;
       await onFetchSuccess(response);
       data.value = response;
     } catch (err) {

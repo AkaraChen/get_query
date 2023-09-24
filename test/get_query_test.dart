@@ -6,17 +6,13 @@ import 'package:test/test.dart';
 
 final Logger logger = Logger();
 
-Future<String> fetch() async {
-  await Future.delayed(Duration(seconds: 1));
-  return 'data';
-}
-
 class SimpleController extends QueryController<String, void, String> {
   SimpleController({super.context = '', super.options});
 
   @override
-  Future<String> callFetch(String context) {
-    return fetch();
+  Future<String> callFetch(String context) async {
+    await Future.delayed(Duration(seconds: 1));
+    return 'data';
   }
 }
 
