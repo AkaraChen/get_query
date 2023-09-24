@@ -2,6 +2,10 @@
 
 [简体中文](./README.CN.md)
 
+```
+🧪 Work in progress
+```
+
 The missing async state management wrapper for GetX.
 
 ## Motivation
