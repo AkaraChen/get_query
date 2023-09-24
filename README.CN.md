@@ -13,3 +13,11 @@ GetX 中缺失的异步状态管理包装器。
 2. 自动处理错误和加载状态。
 3. 当 Widget 被释放时，自动取消请求。
 4. 支持两种类型：`Query` 和 `Mutation`。
+5. 当发生 Exception（非 Error）时自动重试。
+6. 使用 QueryClient 存储缓存。
+
+## TODO
+1. 分页支持？
+2. `InfiniteQueryController` `QueriesController`。
+3. Flutter widget 支持。
+4. `InitialData`/`PlaceholderData` 支持。

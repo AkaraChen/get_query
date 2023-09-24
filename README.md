@@ -13,11 +13,12 @@ The missing async state management wrapper for GetX.
 2. Automatically handle error and loading state.
 3. Support two type: `Query` and `Mutation`.
 4. Automatically cancel the query when the widget is disposed.
+5. Auto retry when exception(not error) occurs.
+6. Use `QueryClient` to store cache.
 
 ## TODO
 
 1. Pagination support?
-2. Use `QueryClient` to store cache?
-3. `InfiniteQueryController` `QueriesController`.
-4. Flutter widget support.
-5. InitialData/PlaceholderData support.
+2. `InfiniteQueryController` `QueriesController`.
+3. Flutter widget support.
+4. `InitialData`/`PlaceholderData` support.
