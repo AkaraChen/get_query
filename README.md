@@ -15,7 +15,7 @@ The missing async state management wrapper for GetX.
 
 ## TODO
 
-1. Pagination support.
+1. Should we have a pagination support?
 2. Should we have a `QueryClient` to store cache?
 3. `InfiniteQueryController` `QueriesController`.
 4. Flutter widget support.

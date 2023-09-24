@@ -1,16 +1,8 @@
 import 'package:get/get.dart';
-import 'package:get_query/get_query.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_query/src/middlewares/cancelable.dart';
 import 'package:get_query/src/middlewares/middleware.dart';
-
-class QueryControllerOptions {
-  final RetryConfig retry;
-
-  const QueryControllerOptions({
-    this.retry = const RetryConfig(maxAttempts: 0),
-  });
-}
+import 'package:get_query/src/options.dart';
 
 class QueryController<FetchContext, RequestBody, ResponseData>
     extends GetxController {
@@ -59,20 +51,12 @@ class QueryController<FetchContext, RequestBody, ResponseData>
 
   bool get isFetching => future.value != null;
 
-  @protected
   final data = Rxn<ResponseData>();
 
-  @protected
   final error = Rxn<dynamic>();
   bool get isError => error.value != null;
 
   Future<void> onFetchSuccess(ResponseData data) async {}
   Future<void> onFetchError(dynamic err) async {}
   Future<void> onFetchComplete() async {}
-
-  @override
-  void onClose() {
-    super.onClose();
-    print('onClose');
-  }
 }

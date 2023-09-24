@@ -12,7 +12,6 @@ dependencies:
   get: ^4.6.6
   flutter:
     sdk: flutter
-  retry: ^3.1.2
   logger: ^2.0.2
   # path: ^1.8.0
 

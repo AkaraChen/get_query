@@ -1,6 +1,7 @@
 // ignore_for_file: invalid_use_of_protected_member, empty_catches, argument_type_not_assignable_to_error_handler
 
 import 'package:get_query/get_query.dart';
+import 'package:get_query/src/middlewares/retry.dart';
 import 'package:logger/logger.dart';
 import 'package:test/test.dart';
 
@@ -11,7 +12,6 @@ class SimpleController extends QueryController<String, void, String> {
 
   @override
   Future<String> callFetch(String context) async {
-    await Future.delayed(Duration(seconds: 1));
     return 'data';
   }
 }
@@ -21,7 +21,6 @@ class ErrorController extends QueryController<String, void, String> {
 
   @override
   Future<String> callFetch(String context) async {
-    await Future.delayed(Duration.zero);
     throw Exception('error');
   }
 }
