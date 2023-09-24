@@ -1,3 +1,4 @@
+import 'package:async/async.dart';
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_query/src/middlewares/cancelable.dart';
@@ -22,8 +23,9 @@ class QueryController<FetchContext, RequestBody, ResponseData>
 
   @protected
   final future = Rxn<Future<ResponseData>>();
-  // @protected
-  // final cancelable = Rxn<CancelableOperation<ResponseData>>();
+
+  @protected
+  final CancelableCompleter<ResponseData> completer = CancelableCompleter();
 
   // must be implemented
   Future<ResponseData> callFetch(FetchContext context) async {
@@ -34,7 +36,7 @@ class QueryController<FetchContext, RequestBody, ResponseData>
     try {
       final middlewareChain = MiddlewareChain<ResponseData>([
         options.retry.createRetryMiddleware<ResponseData>(),
-        CancelableMiddleware(),
+        CancelableMiddleware(completer: completer),
       ]);
 
       var futureWithMiddleware = middlewareChain.applyMiddleware(
@@ -70,4 +72,12 @@ class QueryController<FetchContext, RequestBody, ResponseData>
   Future<void> onFetchSuccess(ResponseData data) async {}
   Future<void> onFetchError(dynamic err) async {}
   Future<void> onFetchComplete() async {}
+
+  @override
+  void onClose() {
+    super.onClose();
+    if (!completer.isCompleted) {
+      completer.operation.cancel();
+    }
+  }
 }

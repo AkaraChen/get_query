@@ -12,6 +12,7 @@ The missing async state management wrapper for GetX.
 1. Simple and easy to use API, no need write isBusy, error, data, etc.
 2. Automatically handle error and loading state.
 3. Support two type: `Query` and `Mutation`.
+4. Automatically cancel the request when the widget is disposed.
 
 ## TODO
 
@@ -20,4 +21,3 @@ The missing async state management wrapper for GetX.
 3. `InfiniteQueryController` `QueriesController`.
 4. Flutter widget support.
 5. InitialData/PlaceholderData support.
-6. Automatically cancel the request when the widget is disposed.
