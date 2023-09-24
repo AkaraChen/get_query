@@ -4,6 +4,16 @@ import 'package:get_query/get_query.dart';
 
 final queryClient = QueryClient();
 
+class QueryClientOptions {
+  final Duration staleTime;
+  final QueryKey key;
+
+  const QueryClientOptions({
+    this.staleTime = const Duration(minutes: 1),
+    required this.key,
+  });
+}
+
 class QueryClientMiddleware<T> extends Middleware<T> {
   final QueryKey key;
   final Duration staleTime;

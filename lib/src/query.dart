@@ -41,7 +41,12 @@ class QueryController<FetchContext, RequestBody, ResponseData>
       final middlewareChain = MiddlewareChain<ResponseData>([
         options.retry.createRetryMiddleware<ResponseData>(),
         CancelableMiddleware(completer: completer),
-        QueryClientMiddleware(key: ['1'], triggerUpdate: fetch)
+        if (options.queryClient != null)
+          QueryClientMiddleware(
+            key: options.queryClient!.key,
+            triggerUpdate: fetch,
+            staleTime: options.queryClient!.staleTime,
+          )
       ]);
 
       var futureWithMiddleware = middlewareChain.applyMiddleware(
