@@ -39,7 +39,7 @@ class QueryController<FetchContext, RequestBody, ResponseData>
 
       final response = await futureWithMiddleware;
       await onFetchSuccess(response);
-      data.value = response;
+      setData((data) => response);
     } catch (err) {
       await onFetchError(err);
       error.value = err;
@@ -51,7 +51,12 @@ class QueryController<FetchContext, RequestBody, ResponseData>
 
   bool get isFetching => future.value != null;
 
-  final data = Rxn<ResponseData>();
+  ResponseData? _data;
+  ResponseData get data => _data!;
+  setData(Function(ResponseData? data) updater) {
+    _data = updater(_data);
+    update();
+  }
 
   final error = Rxn<dynamic>();
   bool get isError => error.value != null;

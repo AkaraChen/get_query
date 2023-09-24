@@ -29,13 +29,11 @@ void main() {
   test('should be able to fetch data', () async {
     final controller = SimpleController();
     await controller.fetch();
-    expect(controller.data.value, isA<String>());
+    expect(controller.data, isA<String>());
   });
 
   test('should be able to have error', () async {
-    final controller = ErrorController(
-      context: '',
-    );
+    final controller = ErrorController();
     try {
       await controller.fetch();
     } catch (e) {}
@@ -45,7 +43,6 @@ void main() {
   test('should be able to retry', () async {
     var count = 0;
     final controller = ErrorController(
-      context: '',
       options: QueryControllerOptions(
         retry: RetryConfig(
           maxAttempts: 3,
