@@ -7,19 +7,19 @@ class MutationControllerOptions extends QueryControllerOptions {
 }
 
 // Use for doing some async task
-class MutationController<MutationContext, RequestBody, ResponseData>
-    extends QueryController<MutationContext, RequestBody, ResponseData> {
+class MutationController<RequestBody, ResponseData>
+    extends QueryController<RequestBody, ResponseData> {
   final MutationControllerOptions mutationOptions;
 
   MutationController({
-    required super.context,
     this.mutationOptions = const MutationControllerOptions(),
+    required super.call,
   });
 
   bool get isMutating => isFetching;
 
   @override
-  Future<void> fetch() async {
+  Future<void> fetch(RequestBody body) async {
     throw UnsupportedError('Use mutate() instead');
   }
 
@@ -30,7 +30,7 @@ class MutationController<MutationContext, RequestBody, ResponseData>
       ]);
 
       var futureWithMiddleware = middlewareChain.applyMiddleware(
-        () => callFetch(context),
+        () => call(body),
       );
 
       future.value = futureWithMiddleware;
@@ -43,12 +43,6 @@ class MutationController<MutationContext, RequestBody, ResponseData>
     } finally {
       await onMutateComplete();
     }
-  }
-
-  // must be implemented
-  Future<ResponseData> callMutate(
-      MutationContext context, RequestBody body) async {
-    throw UnimplementedError();
   }
 
   Future<void> onMutateSuccess(ResponseData data, RequestBody body) async {}

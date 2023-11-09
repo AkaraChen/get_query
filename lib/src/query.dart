@@ -7,17 +7,16 @@ import 'package:get_query/src/middlewares/query_client.dart';
 import 'package:get_query/src/middlewares/retry.dart';
 import 'package:get_query/src/options.dart';
 
-class QueryController<FetchContext, RequestBody, ResponseData>
-    extends GetxController {
-  final FetchContext context;
+class QueryController<RequestBody, ResponseData> extends GetxController {
   final QueryControllerOptions options;
+  final Future<ResponseData> Function(RequestBody body) call;
 
   QueryController({
-    required this.context,
     this.options = const QueryControllerOptions(
         retry: RetryConfig(
       maxAttempts: 3,
     )),
+    required this.call,
   });
 
   bool get isFetching => future.value != null;
@@ -28,33 +27,27 @@ class QueryController<FetchContext, RequestBody, ResponseData>
   @protected
   final CancelableCompleter<ResponseData> completer = CancelableCompleter();
 
-  // must be implemented
-  Future<ResponseData> callFetch(FetchContext context) async {
-    throw UnimplementedError();
-  }
-
-  Future<void> fetch() async {
+  Future<void> fetch(RequestBody body) async {
     if (isFetching) {
       completer.operation.cancel();
     }
     try {
+      caller() => call(body);
+
       final middlewareChain = MiddlewareChain<ResponseData>([
         options.retry.createRetryMiddleware<ResponseData>(),
         CancelableMiddleware(completer: completer),
         if (options.queryClient != null)
           QueryClientMiddleware(
             key: options.queryClient!.key,
-            triggerUpdate: fetch,
+            triggerUpdate: caller,
             staleTime: options.queryClient!.staleTime,
           )
       ]);
 
-      var futureWithMiddleware = middlewareChain.applyMiddleware(
-        () => callFetch(context),
-      );
+      var futureWithMiddleware = middlewareChain.applyMiddleware(caller);
 
       future.value = futureWithMiddleware;
-
       final response = await futureWithMiddleware;
       await onFetchSuccess(response);
       setData((data) => response);

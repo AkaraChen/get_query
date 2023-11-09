@@ -3,12 +3,13 @@
 import 'package:get_query/get_query.dart';
 import 'package:test/test.dart';
 
-import '../get_query_test.dart';
-
 void main() {
   test('should be able to retry', () async {
     var count = 0;
-    final controller = ErrorController(
+    final controller = QueryController(
+      call: (body) async {
+        throw Exception('error');
+      },
       options: QueryControllerOptions(
         retry: RetryConfig(
           maxAttempts: 3,
@@ -19,14 +20,16 @@ void main() {
       ),
     );
     try {
-      await controller.fetch();
+      await controller.fetch('');
     } catch (e) {}
     expect(count, 3);
   });
 
   test('should not retry by default in mutation', () {
     var count = 0;
-    final controller = ErrorMutation(mutationOptions: MutationControllerOptions(
+    final controller = MutationController(call: (body) async {
+      throw Exception('error');
+    }, mutationOptions: MutationControllerOptions(
       retry: RetryConfig(
         onRetry: (e) async {
           count++;

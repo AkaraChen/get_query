@@ -6,15 +6,15 @@ import '../get_query_test.dart';
 
 void main() {
   test('should be able to fetch data', () async {
-    final controller = SimpleController();
-    await controller.fetch();
+    final controller = simple();
+    await controller.fetch('');
     expect(controller.data, isA<String>());
   });
 
   test('should be able to have error', () async {
-    final controller = ErrorController();
+    final controller = error();
     try {
-      await controller.fetch();
+      await controller.fetch('');
     } catch (e) {}
     expect(controller.error, isNot(Null));
   });
