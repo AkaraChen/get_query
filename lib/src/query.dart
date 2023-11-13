@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:async/async.dart';
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart';
@@ -11,12 +13,20 @@ class QueryController<RequestBody, ResponseData> extends GetxController {
   final QueryControllerOptions options;
   final Future<ResponseData> Function(RequestBody body) call;
 
+  final FutureOr<void> Function(ResponseData data)? onFetchSuccess;
+  final FutureOr<void> Function(dynamic err)? onFetchError;
+  final FutureOr<void> Function()? onFetchComplete;
+
   QueryController({
     this.options = const QueryControllerOptions(
-        retry: RetryConfig(
-      maxAttempts: 3,
-    )),
+      retry: RetryConfig(
+        maxAttempts: 3,
+      ),
+    ),
     required this.call,
+    this.onFetchSuccess,
+    this.onFetchError,
+    this.onFetchComplete,
   });
 
   bool get isFetching => future.value != null;
@@ -49,13 +59,19 @@ class QueryController<RequestBody, ResponseData> extends GetxController {
 
       future.value = futureWithMiddleware;
       final response = await futureWithMiddleware;
-      await onFetchSuccess(response);
+      if (onFetchSuccess != null) {
+        await onFetchSuccess!(response);
+      }
       setData((data) => response);
     } catch (err) {
-      await onFetchError(err);
+      if (onFetchError != null) {
+        await onFetchError!(err);
+      }
       error.value = err;
     } finally {
-      await onFetchComplete();
+      if (onFetchComplete != null) {
+        await onFetchComplete!();
+      }
       future.value = null;
     }
   }
@@ -71,10 +87,6 @@ class QueryController<RequestBody, ResponseData> extends GetxController {
 
   final error = Rxn<dynamic>();
   bool get isError => error.value != null;
-
-  Future<void> onFetchSuccess(ResponseData data) async {}
-  Future<void> onFetchError(dynamic err) async {}
-  Future<void> onFetchComplete() async {}
 
   @override
   void onClose() {

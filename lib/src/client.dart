@@ -83,6 +83,5 @@ class QueryClient {
     _cache.remove(key._clientKey);
   }
 
-  // TODO: implement prefetch
   // TODO: support placeholderData and initialData
 }

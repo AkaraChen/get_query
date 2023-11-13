@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:get_query/get_query.dart';
 
 class MutationControllerOptions extends QueryControllerOptions {
@@ -11,9 +13,16 @@ class MutationController<RequestBody, ResponseData>
     extends QueryController<RequestBody, ResponseData> {
   final MutationControllerOptions mutationOptions;
 
+  final FutureOr<void> Function(ResponseData data)? onMutateSuccess;
+  final FutureOr<void> Function(dynamic err)? onMutateError;
+  final FutureOr<void> Function()? onMutateComplete;
+
   MutationController({
     this.mutationOptions = const MutationControllerOptions(),
     required super.call,
+    this.onMutateSuccess,
+    this.onMutateError,
+    this.onMutateComplete,
   });
 
   bool get isMutating => isFetching;
@@ -35,17 +44,19 @@ class MutationController<RequestBody, ResponseData>
 
       future.value = futureWithMiddleware;
       final response = await futureWithMiddleware;
-      await onMutateSuccess(response, body);
+      if (onMutateSuccess != null) {
+        await onMutateSuccess!(response);
+      }
     } catch (err) {
-      await onMutateError(err);
-      error.value = err as Error;
+      if (onMutateError != null) {
+        await onMutateError!(err);
+      }
+      error.value = err;
       // rethrow;
     } finally {
-      await onMutateComplete();
+      if (onMutateComplete != null) {
+        await onMutateComplete!();
+      }
     }
   }
-
-  Future<void> onMutateSuccess(ResponseData data, RequestBody body) async {}
-  Future<void> onMutateError(dynamic err) async {}
-  Future<void> onMutateComplete() async {}
 }
