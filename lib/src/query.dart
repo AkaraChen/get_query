@@ -59,19 +59,13 @@ class QueryController<RequestBody, ResponseData> extends GetxController {
 
       future.value = futureWithMiddleware;
       final response = await futureWithMiddleware;
-      if (onFetchSuccess != null) {
-        await onFetchSuccess!(response);
-      }
+      await onFetchSuccess?.call(response);
       setData((data) => response);
     } catch (err) {
-      if (onFetchError != null) {
-        await onFetchError!(err);
-      }
+      await onFetchError?.call(err);
       error.value = err;
     } finally {
-      if (onFetchComplete != null) {
-        await onFetchComplete!();
-      }
+      onFetchComplete?.call();
       future.value = null;
     }
   }

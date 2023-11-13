@@ -44,19 +44,12 @@ class MutationController<RequestBody, ResponseData>
 
       future.value = futureWithMiddleware;
       final response = await futureWithMiddleware;
-      if (onMutateSuccess != null) {
-        await onMutateSuccess!(response);
-      }
+      await onMutateSuccess?.call(response);
     } catch (err) {
-      if (onMutateError != null) {
-        await onMutateError!(err);
-      }
+      await onMutateError?.call(err);
       error.value = err;
-      // rethrow;
     } finally {
-      if (onMutateComplete != null) {
-        await onMutateComplete!();
-      }
+      await onMutateComplete?.call();
     }
   }
 }
