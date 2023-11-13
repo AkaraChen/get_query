@@ -2,7 +2,7 @@
 
 import 'package:test/test.dart';
 
-import '../get_query_test.dart';
+import '../t_utils.dart';
 
 void main() {
   test('should be able to fetch data', () async {

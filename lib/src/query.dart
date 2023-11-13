@@ -35,14 +35,14 @@ class QueryController<RequestBody, ResponseData> extends GetxController {
       caller() => call(body);
 
       final middlewareChain = MiddlewareChain<ResponseData>([
-        options.retry.createRetryMiddleware<ResponseData>(),
-        CancelableMiddleware(completer: completer),
         if (options.queryClient != null)
           QueryClientMiddleware(
             key: options.queryClient!.key,
             triggerUpdate: caller,
             staleTime: options.queryClient!.staleTime,
-          )
+          ),
+        options.retry.createRetryMiddleware<ResponseData>(),
+        CancelableMiddleware(completer: completer),
       ]);
 
       var futureWithMiddleware = middlewareChain.applyMiddleware(caller);
