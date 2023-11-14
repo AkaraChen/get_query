@@ -52,4 +52,10 @@ class MutationController<RequestBody, ResponseData>
       await onMutateComplete?.call();
     }
   }
+
+  @override
+  void onClose() {
+    // `super.onClose()` will cancel the completer
+    // but mutation should not be cancelable
+  }
 }
